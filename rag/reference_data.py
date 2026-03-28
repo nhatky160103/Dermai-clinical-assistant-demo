@@ -1,0 +1,252 @@
+"""
+Reference Data — Pre-built knowledge base of dermoscopy reference cases.
+
+Provides curated reference cases from ISIC 2018 with clinical descriptions.
+Used to populate ChromaDB on first run+fallback cases when RAG is unavailable.
+"""
+import os
+import json
+from typing import List
+from dataclasses import dataclass
+
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+
+# ──────────────────────────────────────────────────────── Reference Knowledge Base
+REFERENCE_CASES = [
+    {
+        "case_id": "ref_mel_001",
+        "diagnosis": "MEL",
+        "diagnosis_name": "Melanoma",
+        "structures": ["pigment_network", "streaks", "globules"],
+        "description": (
+            "Dermoscopy of melanoma showing atypical pigment network with irregular meshes, "
+            "radial streaks at periphery indicating radial growth phase, and irregularly distributed "
+            "brown-black globules. Asymmetric pattern with multiple colors (brown, black, blue-gray). "
+            "These features strongly suggest malignancy and warrant immediate excisional biopsy."
+        ),
+        "clinical_notes": "Asymmetric lesion, irregular borders, diameter > 6mm. ABCDE criteria positive.",
+        "source": "ISIC 2018 Training Set — HAM10000",
+    },
+    {
+        "case_id": "ref_mel_002",
+        "diagnosis": "MEL",
+        "diagnosis_name": "Melanoma",
+        "structures": ["pigment_network", "negative_network"],
+        "description": (
+            "Superficial spreading melanoma with prominent atypical pigment network and areas of "
+            "negative network (inverse pattern). The negative network creates a serpiginous pattern "
+            "of hypopigmented lines surrounding darker structures. Multiple regression areas visible."
+        ),
+        "clinical_notes": "Changing lesion with regression zones. Breslow thickness assessment needed.",
+        "source": "ISIC 2018 Training Set — MSK Dataset",
+    },
+    {
+        "case_id": "ref_nv_001",
+        "diagnosis": "NV",
+        "diagnosis_name": "Melanocytic Nevus",
+        "structures": ["pigment_network", "globules"],
+        "description": (
+            "Dermoscopy of compound melanocytic nevus showing regular pigment network with "
+            "homogeneous brown meshes becoming thinner at periphery. Symmetric globular pattern "
+            "with regular brown globules distributed uniformly. Classic benign pattern."
+        ),
+        "clinical_notes": "Stable lesion, symmetric, uniform color. No change reported by patient.",
+        "source": "ISIC 2018 Training Set — HAM10000",
+    },
+    {
+        "case_id": "ref_nv_002",
+        "diagnosis": "NV",
+        "diagnosis_name": "Melanocytic Nevus",
+        "structures": ["pigment_network"],
+        "description": (
+            "Junctional melanocytic nevus with typical reticular pattern. Regular pigment network "
+            "with uniform mesh size and line thickness. Symmetric distribution. Fading of network "
+            "at lesion borders is a reassuring sign of benignity."
+        ),
+        "clinical_notes": "Flat lesion, stable over time. Regular dermoscopic pattern.",
+        "source": "ISIC 2018 Training Set — HAM10000",
+    },
+    {
+        "case_id": "ref_bcc_001",
+        "diagnosis": "BCC",
+        "diagnosis_name": "Basal Cell Carcinoma",
+        "structures": ["globules", "negative_network"],
+        "description": (
+            "Basal cell carcinoma showing blue-gray ovoid nests (globules) and areas resembling "
+            "negative network. Arborizing telangiectasia visible. Absence of pigment network "
+            "confirms non-melanocytic origin. Ulceration and shiny white structures present."
+        ),
+        "clinical_notes": "Non-melanocytic lesion with BCC-specific features. Biopsy recommended.",
+        "source": "ISIC 2018 Training Set — HAM10000",
+    },
+    {
+        "case_id": "ref_bcc_002",
+        "diagnosis": "BCC",
+        "diagnosis_name": "Basal Cell Carcinoma",
+        "structures": ["negative_network", "globules"],
+        "description": (
+            "Pigmented basal cell carcinoma with spoke-wheel structures, blue-gray globules, "
+            "and crystalline (shiny white) structures visible under polarized dermoscopy. "
+            "The negative network pattern helps distinguish from melanocytic lesions."
+        ),
+        "clinical_notes": "Pearly papule with telangiectasia. Mohs surgery may be indicated.",
+        "source": "ISIC 2018 Training Set — MSK Dataset",
+    },
+    {
+        "case_id": "ref_akiec_001",
+        "diagnosis": "AKIEC",
+        "diagnosis_name": "Actinic Keratosis",
+        "structures": ["milia_like_cyst"],
+        "description": (
+            "Actinic keratosis showing surface scale and subtle white-yellow milia-like cysts. "
+            "Strawberry pattern with erythematous pseudo-network. Hair follicle openings preserved. "
+            "Targetoid follicular openings visible on sun-damaged skin."
+        ),
+        "clinical_notes": "Sun-exposed area, rough scaly surface. Monitor for SCC transformation.",
+        "source": "ISIC 2018 Training Set — HAM10000",
+    },
+    {
+        "case_id": "ref_bkl_001",
+        "diagnosis": "BKL",
+        "diagnosis_name": "Benign Keratosis (Seb. Keratosis)",
+        "structures": ["milia_like_cyst", "globules"],
+        "description": (
+            "Seborrheic keratosis with classic milia-like cysts (white-yellow round globules) "
+            "and comedo-like openings. 'Brain-like' or cerebriform pattern. Sharp demarcation "
+            "with stuck-on appearance. Fissures and ridges forming gyri and sulci pattern."
+        ),
+        "clinical_notes": "Classic benign keratosis. No treatment needed unless cosmetically bothersome.",
+        "source": "ISIC 2018 Training Set — HAM10000",
+    },
+    {
+        "case_id": "ref_bkl_002",
+        "diagnosis": "BKL",
+        "diagnosis_name": "Benign Keratosis (Seb. Keratosis)",
+        "structures": ["milia_like_cyst"],
+        "description": (
+            "Solar lentigo / flat seborrheic keratosis showing moth-eaten borders, "
+            "fingerprint-like structures, and scattered milia-like cysts. "
+            "Uniform brown color with sharp demarcation. No melanocytic features."
+        ),
+        "clinical_notes": "Flat keratosis on sun-exposed area. Benign, stable appearance.",
+        "source": "ISIC 2018 Training Set — HAM10000",
+    },
+    {
+        "case_id": "ref_df_001",
+        "diagnosis": "DF",
+        "diagnosis_name": "Dermatofibroma",
+        "structures": ["pigment_network", "globules"],
+        "description": (
+            "Dermatofibroma with central white scar-like patch and peripheral delicate pigment "
+            "network. Central white-to-yellow area with stellate shape. Ring-like globules at "
+            "periphery. Classic dermoscopic pattern is pathognomonic."
+        ),
+        "clinical_notes": "Firm papule that dimples on lateral compression. Benign, stable.",
+        "source": "ISIC 2018 Training Set — HAM10000",
+    },
+    {
+        "case_id": "ref_vasc_001",
+        "diagnosis": "VASC",
+        "diagnosis_name": "Vascular Lesion (Angioma)",
+        "structures": ["globules"],
+        "description": (
+            "Cherry angioma showing red-purple lacunae (globules) with well-demarcated round "
+            "to oval structures. Homogeneous red-blue pattern without pigment network. "
+            "White septa between lacunae create honeycomb-like pattern."
+        ),
+        "clinical_notes": "Typical vascular lesion. No melanocytic features. Benign.",
+        "source": "ISIC 2018 Training Set — HAM10000",
+    },
+    {
+        "case_id": "ref_vasc_002",
+        "diagnosis": "VASC",
+        "diagnosis_name": "Vascular Lesion (Pyogenic Granuloma)",
+        "structures": [],
+        "description": (
+            "Pyogenic granuloma with homogeneous reddish area and white collarette at base. "
+            "No dermoscopic structures of melanocytic lesions. Vascular pattern with "
+            "white rail lines. History of rapid growth and bleeding."
+        ),
+        "clinical_notes": "Rapidly growing vascular lesion. Biopsy to rule out amelanotic melanoma.",
+        "source": "ISIC 2018 Training Set — MSK Dataset",
+    },
+]
+
+
+def populate_store(store) -> int:
+    """
+    Populate the embedding store with reference cases.
+
+    Args:
+        store: EmbeddingStore instance
+
+    Returns:
+        Number of cases added
+    """
+    count = 0
+    for case in REFERENCE_CASES:
+        store.add_reference_case(
+            case_id=case["case_id"],
+            description=case["description"],
+            metadata={
+                "diagnosis": case["diagnosis"],
+                "diagnosis_name": case["diagnosis_name"],
+                "structures": case["structures"],
+                "clinical_notes": case.get("clinical_notes", ""),
+                "source": case.get("source", "ISIC 2018"),
+            },
+        )
+        count += 1
+    return count
+
+
+def get_fallback_cases(query_text: str, top_k: int = 3):
+    """
+    Fallback case retrieval when ChromaDB/CLIP not available.
+    Uses simple keyword matching.
+    """
+    from rag.embedding_store import ReferenceCase
+
+    query_lower = query_text.lower()
+    scored_cases = []
+
+    for case in REFERENCE_CASES:
+        score = 0
+
+        # Match diagnosis
+        if case["diagnosis"].lower() in query_lower:
+            score += 3
+        if case["diagnosis_name"].lower() in query_lower:
+            score += 2
+
+        # Match structures
+        for struct in case["structures"]:
+            if struct.replace("_", " ") in query_lower:
+                score += 1
+
+        # Match description keywords
+        desc_words = case["description"].lower().split()
+        query_words = set(query_lower.split())
+        overlap = len(set(desc_words) & query_words)
+        score += overlap * 0.1
+
+        scored_cases.append((score, case))
+
+    # Sort by score
+    scored_cases.sort(key=lambda x: x[0], reverse=True)
+
+    results = []
+    for score, case in scored_cases[:top_k]:
+        results.append(ReferenceCase(
+            case_id=case["case_id"],
+            diagnosis=case["diagnosis"],
+            diagnosis_name=case["diagnosis_name"],
+            structures=case["structures"],
+            description=case["description"],
+            similarity_score=round(min(score / 5.0, 1.0), 3),
+            source=case.get("source", "ISIC 2018"),
+        ))
+
+    return results

@@ -1,0 +1,297 @@
+/* ──────────────────────────────────────────────────────────────── */
+/*  DermAI Clinical Assistant — Premium Dark Theme                */
+/* ──────────────────────────────────────────────────────────────── */
+
+/* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ─── Root Variables ─── */
+:root {
+    --bg-primary: #0f1117;
+    --bg-secondary: #1a1d29;
+    --bg-card: #1e2130;
+    --bg-glass: rgba(30, 33, 48, 0.85);
+    --border-color: rgba(255, 255, 255, 0.06);
+    --border-hover: rgba(255, 255, 255, 0.12);
+    --text-primary: #e8eaf0;
+    --text-secondary: #9ba3b5;
+    --text-muted: #636d83;
+    --accent-blue: #4f8cff;
+    --accent-purple: #a78bfa;
+    --accent-green: #34d399;
+    --accent-red: #ef4444;
+    --accent-orange: #f59e0b;
+    --gradient-primary: linear-gradient(135deg, #4f8cff 0%, #a78bfa 100%);
+    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+    --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 0 30px rgba(79, 140, 255, 0.15);
+    --radius: 12px;
+    --radius-lg: 16px;
+}
+
+/* ─── Global Overrides ─── */
+.gradio-container {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    background: var(--bg-primary) !important;
+    max-width: 1400px !important;
+}
+
+.dark {
+    --background-fill-primary: var(--bg-primary) !important;
+    --background-fill-secondary: var(--bg-secondary) !important;
+}
+
+/* ─── Header ─── */
+.app-header {
+    text-align: center;
+    padding: 2rem 1rem 1.5rem;
+    background: linear-gradient(180deg, rgba(79, 140, 255, 0.08) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+.app-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.app-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* ─── Cards ─── */
+.result-card {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: 1.5rem !important;
+    box-shadow: var(--shadow-card) !important;
+    transition: all 0.3s ease !important;
+}
+
+.result-card:hover {
+    border-color: var(--border-hover) !important;
+    box-shadow: var(--shadow-card), var(--shadow-glow) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ─── Risk Banners ─── */
+.risk-banner {
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.risk-high {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(249, 115, 22, 0.1));
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+
+.risk-moderate {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.1));
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fcd34d;
+}
+
+.risk-low {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #6ee7b7;
+}
+
+/* ─── Tab styling ─── */
+.tab-nav button {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.9rem !important;
+    padding: 0.75rem 1.25rem !important;
+    border-radius: var(--radius) var(--radius) 0 0 !important;
+    transition: all 0.2s ease !important;
+}
+
+.tab-nav button.selected {
+    background: var(--bg-card) !important;
+    border-bottom: 2px solid var(--accent-blue) !important;
+}
+
+/* ─── Structure table ─── */
+.structure-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    font-size: 0.9rem;
+}
+
+.structure-table th {
+    background: rgba(79, 140, 255, 0.1);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--accent-blue);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.structure-table td {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.structure-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* ─── Progress indicators ─── */
+.confidence-bar {
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.confidence-bar .fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--gradient-primary);
+    transition: width 0.6s ease;
+}
+
+/* ─── Upload area ─── */
+.upload-area {
+    border: 2px dashed rgba(79, 140, 255, 0.3) !important;
+    border-radius: var(--radius-lg) !important;
+    background: rgba(79, 140, 255, 0.03) !important;
+    transition: all 0.3s ease !important;
+}
+
+.upload-area:hover {
+    border-color: var(--accent-blue) !important;
+    background: rgba(79, 140, 255, 0.06) !important;
+}
+
+/* ─── Markdown report ─── */
+.report-content {
+    line-height: 1.7;
+    color: var(--text-primary);
+}
+
+.report-content h1 {
+    font-size: 1.5rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+.report-content h2 {
+    font-size: 1.15rem;
+    color: var(--accent-blue);
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.report-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.85rem;
+}
+
+.report-content th {
+    background: rgba(79, 140, 255, 0.08);
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+.report-content td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.report-content blockquote {
+    border-left: 3px solid var(--accent-blue);
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    background: rgba(79, 140, 255, 0.05);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    color: var(--text-secondary);
+}
+
+/* ─── Loading animation ─── */
+.analyzing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    color: var(--accent-blue);
+    font-weight: 500;
+}
+
+.analyzing-indicator .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    animation: pulse 1.4s infinite ease-in-out;
+}
+
+.analyzing-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
+.analyzing-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+/* ─── Similar cases gallery ─── */
+.case-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.case-card:hover {
+    border-color: var(--accent-purple);
+    transform: translateX(4px);
+}
+
+.case-card .diagnosis-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: rgba(167, 139, 250, 0.15);
+    color: var(--accent-purple);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+    .app-header h1 { font-size: 1.5rem; }
+    .result-card { padding: 1rem !important; }
+}
