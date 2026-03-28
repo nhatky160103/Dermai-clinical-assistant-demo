@@ -40,8 +40,8 @@ from config import (
     DISEASE_FULL_NAMES, DISEASE_COLORS, DISEASE_RISK_LEVELS,
     TASK2_MODEL_PATH, TASK3_MODEL_PATH,
 )
-from models.task2_segmenter import get_segmenter
-from models.task3_classifier import get_classifier
+from models.task2_segmenter.task2_segmenter import get_segmenter
+from models.task3_classifier.task3_classifier import get_classifier
 from pipeline.context_builder import build_context
 from pipeline.image_search import search_similar_cases, format_similar_cases_text, initialize_reference_database
 from pipeline.llm_explainer import get_llm_explanation
@@ -293,6 +293,10 @@ def format_similar_cases_html(cases) -> str:
             DISEASE_RISK_LEVELS.get(case.diagnosis, "LOW"), "#10b981"
         )
         structures = ", ".join(s.replace("_", " ").title() for s in case.structures) if case.structures else "None"
+        evidence = (
+            f"{getattr(case, 'diagnosis_confirm_type', 'single image expert consensus')} "
+            f"(w={getattr(case, 'evidence_weight', 0.6):.2f})"
+        )
 
         parts.append(f"""
         <div class="case-card">
@@ -307,6 +311,9 @@ def format_similar_cases_html(cases) -> str:
             </div>
             <div style="font-size: 0.85rem; color: #9ba3b5; margin-bottom: 0.25rem;">
                 <strong>Structures:</strong> {structures}
+            </div>
+            <div style="font-size: 0.85rem; color: #9ba3b5; margin-bottom: 0.25rem;">
+                <strong>Evidence:</strong> {evidence}
             </div>
             <div style="font-size: 0.85rem; color: #9ba3b5; line-height: 1.5;">
                 {case.description[:300]}{'...' if len(case.description) > 300 else ''}

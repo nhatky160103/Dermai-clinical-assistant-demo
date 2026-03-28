@@ -266,6 +266,13 @@ def generate_report_markdown(
             lines.append(f"- **Diagnosis:** {case.diagnosis_name} ({case.diagnosis})")
             if case.structures:
                 lines.append(f"- **Structures:** {', '.join(s.replace('_', ' ').title() for s in case.structures)}")
+            if getattr(case, "rule_tags", None):
+                lines.append(f"- **Rule Tags:** {', '.join(t.replace('_', ' ').title() for t in case.rule_tags)}")
+            lines.append(
+                "- **Evidence:** "
+                f"{getattr(case, 'diagnosis_confirm_type', 'single image expert consensus')} "
+                f"(weight={getattr(case, 'evidence_weight', 0.6):.2f})"
+            )
             lines.append(f"- **Description:** {case.description}")
             lines.append(f"- **Source:** {case.source}")
             lines.append("")

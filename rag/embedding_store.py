@@ -7,8 +7,8 @@ ChromaDB as the vector store for fast similarity search.
 import os
 import json
 import numpy as np
-from typing import List, Optional
-from dataclasses import dataclass
+from typing import List, Optional, Dict, Any
+from dataclasses import dataclass, field
 from PIL import Image
 
 import sys
@@ -23,9 +23,13 @@ class ReferenceCase:
     diagnosis: str
     diagnosis_name: str
     structures: List[str]
+    task2_features: Dict[str, Dict[str, float]]
     description: str
     similarity_score: float
     source: str
+    rule_tags: List[str] = field(default_factory=list)
+    diagnosis_confirm_type: str = "single image expert consensus"
+    evidence_weight: float = 0.6
     image_path: Optional[str] = None
 
 
@@ -34,6 +38,41 @@ class EmbeddingStore:
     ChromaDB-backed embedding store for dermoscopy reference cases.
     Uses CLIP for multi-modal (image + text) embeddings.
     """
+
+    @staticmethod
+    def _safe_json_list(value, default=None) -> List[str]:
+        if default is None:
+            default = []
+        if value is None:
+            return default
+        if isinstance(value, list):
+            return value
+        if isinstance(value, str):
+            try:
+                parsed = json.loads(value)
+                if isinstance(parsed, list):
+                    return [str(v) for v in parsed]
+            except Exception:
+                pass
+            return [value]
+        return default
+
+    @staticmethod
+    def _safe_json_dict(value, default=None) -> Dict[str, Any]:
+        if default is None:
+            default = {}
+        if value is None:
+            return default
+        if isinstance(value, dict):
+            return value
+        if isinstance(value, str):
+            try:
+                parsed = json.loads(value)
+                if isinstance(parsed, dict):
+                    return parsed
+            except Exception:
+                pass
+        return default
 
     def __init__(self, persist_dir: Optional[str] = None):
         self.persist_dir = persist_dir or CHROMA_DB_PATH
@@ -129,7 +168,7 @@ class EmbeddingStore:
         # ChromaDB requires string values in metadata
         safe_metadata = {}
         for k, v in metadata.items():
-            if isinstance(v, (list, tuple)):
+            if isinstance(v, (list, tuple, dict)):
                 safe_metadata[k] = json.dumps(v)
             else:
                 safe_metadata[k] = str(v)
@@ -188,18 +227,34 @@ class EmbeddingStore:
                 doc = results["documents"][0][i] if results["documents"] else ""
                 dist = results["distances"][0][i] if results["distances"] else 1.0
 
-                structures = json.loads(meta.get("structures", "[]"))
-                if isinstance(structures, str):
-                    structures = [structures]
+                structures = self._safe_json_list(meta.get("structures"), default=[])
+                rule_tags = self._safe_json_list(meta.get("rule_tags"), default=[])
+                task2_features = self._safe_json_dict(meta.get("task2_features"), default={})
+                if not structures and task2_features:
+                    structures = [
+                        label for label, feat in task2_features.items()
+                        if isinstance(feat, dict) and bool(feat.get("present", False))
+                    ]
+                try:
+                    evidence_weight = float(meta.get("evidence_weight", 0.6))
+                except (TypeError, ValueError):
+                    evidence_weight = 0.6
 
                 cases.append(ReferenceCase(
                     case_id=case_id,
                     diagnosis=meta.get("diagnosis", "Unknown"),
                     diagnosis_name=meta.get("diagnosis_name", "Unknown"),
                     structures=structures,
+                    task2_features=task2_features,
                     description=doc,
                     similarity_score=round(1 - dist, 3),   # cosine distance → similarity
                     source=meta.get("source", "ISIC 2018"),
+                    rule_tags=rule_tags,
+                    diagnosis_confirm_type=meta.get(
+                        "diagnosis_confirm_type",
+                        "single image expert consensus",
+                    ),
+                    evidence_weight=evidence_weight,
                     image_path=meta.get("image_path"),
                 ))
 
@@ -216,6 +271,19 @@ class EmbeddingStore:
         if self._initialized:
             return self._collection.count()
         return 0
+
+    def get_case_metadata(self, case_id: str) -> dict:
+        """Return metadata for one case id (or empty dict if not found)."""
+        self._lazy_init()
+        if not self._initialized:
+            return {}
+        try:
+            result = self._collection.get(ids=[case_id], include=["metadatas"])
+            if result and result.get("metadatas") and result["metadatas"][0]:
+                return result["metadatas"][0]
+        except Exception:
+            return {}
+        return {}
 
 
 # Singleton instance

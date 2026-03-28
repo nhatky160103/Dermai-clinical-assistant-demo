@@ -6,7 +6,9 @@ into clinical language that dermatologists can understand and verify.
 """
 import os
 import sys
+import json
 from typing import Optional
+from urllib import request, parse
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from config import (
@@ -15,6 +17,10 @@ from config import (
     OPENAI_BASE_URL,
     VERTEX_API_KEY,
     VERTEX_BASE_URL,
+    VERTEX_REST_BASE_URL,
+    GEMINI_API_KEY,
+    GEMINI_MODEL,
+    GEMINI_REST_BASE_URL,
     LLM_MODEL,
     VERTEX_MODEL,
 )
@@ -103,12 +109,40 @@ def get_llm_explanation(
     Returns:
         Clinical explanation text
     """
-    # Provider selection:
-    # - Explicit: LLM_PROVIDER=vertex
-    # - Implicit: no OpenAI key but has VERTEX_API_KEY
-    use_vertex = LLM_PROVIDER == "vertex" or (not OPENAI_API_KEY and bool(VERTEX_API_KEY))
+    prompt = build_clinical_prompt(clinical_context, similar_cases_text)
+    provider = LLM_PROVIDER
 
-    if use_vertex:
+    # Gemini REST (Google AI Studio API-key flow)
+    # Example endpoint:
+    # https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key=...
+    if provider in {"gemini_rest", "google_ai_studio"}:
+        key = api_key or GEMINI_API_KEY
+        mdl = model or GEMINI_MODEL
+        if not key:
+            return _generate_fallback_explanation(clinical_context)
+        try:
+            return _call_gemini_rest_with_api_key(key=key, model_name=mdl, prompt=prompt)
+        except Exception as e:
+            print(f"⚠ LLM API error: {e}. Using fallback explanation.")
+            return _generate_fallback_explanation(clinical_context)
+
+    # Vertex REST (API-key flow on aiplatform)
+    # Example endpoint:
+    # https://aiplatform.googleapis.com/v1/publishers/google/models/{model}:generateContent?key=...
+    if provider in {"vertex_rest", "vertex_api_key"}:
+        key = api_key or VERTEX_API_KEY
+        mdl = model or VERTEX_MODEL
+        if not key:
+            return _generate_fallback_explanation(clinical_context)
+        try:
+            return _call_vertex_rest_with_api_key(key=key, model_name=mdl, prompt=prompt)
+        except Exception as e:
+            print(f"⚠ LLM API error: {e}. Using fallback explanation.")
+            return _generate_fallback_explanation(clinical_context)
+
+    # OpenAI-compatible flow (OpenAI, or custom proxy base_url)
+    use_vertex_compat = provider == "vertex" or (not OPENAI_API_KEY and bool(VERTEX_API_KEY))
+    if use_vertex_compat:
         key = api_key or VERTEX_API_KEY
         base_url = VERTEX_BASE_URL
         mdl = model or VERTEX_MODEL
@@ -119,8 +153,6 @@ def get_llm_explanation(
 
     if not key:
         return _generate_fallback_explanation(clinical_context)
-
-    prompt = build_clinical_prompt(clinical_context, similar_cases_text)
 
     try:
         from openai import OpenAI
@@ -148,6 +180,108 @@ def get_llm_explanation(
     except Exception as e:
         print(f"⚠ LLM API error: {e}. Using fallback explanation.")
         return _generate_fallback_explanation(clinical_context)
+
+
+def _call_vertex_rest_with_api_key(key: str, model_name: str, prompt: str) -> str:
+    """
+    Call Vertex REST generateContent endpoint with API key auth.
+    """
+    endpoint = f"{VERTEX_REST_BASE_URL}/publishers/google/models/{model_name}:generateContent"
+    query = parse.urlencode({"key": key})
+    url = f"{endpoint}?{query}"
+
+    payload = {
+        "contents": [
+            {
+                "role": "user",
+                "parts": [
+                    {
+                        "text": (
+                            f"{SYSTEM_PROMPT}\n\n"
+                            "Now use the following case context:\n\n"
+                            f"{prompt}"
+                        )
+                    }
+                ],
+            }
+        ],
+        "generationConfig": {
+            "temperature": 0.3,
+            "maxOutputTokens": 2000,
+        },
+    }
+
+    req = request.Request(
+        url=url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+
+    with request.urlopen(req, timeout=60) as resp:
+        body = resp.read().decode("utf-8")
+    data = json.loads(body)
+
+    candidates = data.get("candidates", [])
+    if not candidates:
+        raise RuntimeError(f"No candidates returned. Response={data}")
+
+    parts = candidates[0].get("content", {}).get("parts", [])
+    text_chunks = [p.get("text", "") for p in parts if p.get("text")]
+    if not text_chunks:
+        raise RuntimeError(f"No text in candidates. Response={data}")
+    return "\n".join(text_chunks).strip()
+
+
+def _call_gemini_rest_with_api_key(key: str, model_name: str, prompt: str) -> str:
+    """
+    Call Google AI Studio Gemini REST generateContent endpoint with API key auth.
+    """
+    endpoint = f"{GEMINI_REST_BASE_URL}/models/{model_name}:generateContent"
+    query = parse.urlencode({"key": key})
+    url = f"{endpoint}?{query}"
+
+    payload = {
+        "contents": [
+            {
+                "role": "user",
+                "parts": [
+                    {
+                        "text": (
+                            f"{SYSTEM_PROMPT}\n\n"
+                            "Now use the following case context:\n\n"
+                            f"{prompt}"
+                        )
+                    }
+                ],
+            }
+        ],
+        "generationConfig": {
+            "temperature": 0.3,
+            "maxOutputTokens": 2000,
+        },
+    }
+
+    req = request.Request(
+        url=url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+
+    with request.urlopen(req, timeout=60) as resp:
+        body = resp.read().decode("utf-8")
+    data = json.loads(body)
+
+    candidates = data.get("candidates", [])
+    if not candidates:
+        raise RuntimeError(f"No candidates returned. Response={data}")
+
+    parts = candidates[0].get("content", {}).get("parts", [])
+    text_chunks = [p.get("text", "") for p in parts if p.get("text")]
+    if not text_chunks:
+        raise RuntimeError(f"No text in candidates. Response={data}")
+    return "\n".join(text_chunks).strip()
 
 
 def _generate_fallback_explanation(clinical_context) -> str:

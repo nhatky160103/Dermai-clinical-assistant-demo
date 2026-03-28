@@ -147,6 +147,7 @@ class RealSegmenter:
         self.device = None
         self.input_size = int(os.environ.get("TASK2_INPUT_SIZE", "256"))
         self.threshold = float(os.environ.get("TASK2_THRESHOLD", "0.5"))
+        self._predict_fn = None
         self._load_model()
 
     def _load_model(self):
@@ -165,6 +166,32 @@ class RealSegmenter:
             raise RuntimeError("PyTorch is required for RealSegmenter.") from e
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        # Preferred path: Task2 TransUNet helper (same style as training notebook).
+        model_type = os.environ.get("TASK2_MODEL_TYPE", "auto").lower()
+        if model_type in ("auto", "transunet"):
+            try:
+                from models.task2_segmenter.isic_checkpoint_infer import build_task2_predict_fn
+
+                img_size = int(os.environ.get("TASK2_TRANSUNET_IMG_SIZE", "512"))
+                vit_name = os.environ.get("TASK2_TRANSUNET_VIT_NAME", "R50-ViT-B_16")
+                source_dir = os.environ.get("TASK2_TRANSUNET_SOURCE_DIR", "")
+                self._predict_fn = build_task2_predict_fn(
+                    checkpoint_path=self.model_path,
+                    source_dir=source_dir or None,
+                    vit_name=vit_name,
+                    img_size=img_size,
+                    attributes=list(ATTRIBUTES),
+                    threshold=self.threshold,
+                    device=str(self.device),
+                )
+                self.model_name = f"RealSegmenter[TransUNet:{os.path.basename(self.model_path)}]"
+                return
+            except Exception as e:
+                if model_type == "transunet":
+                    raise
+                # auto mode: silently fall back to generic loader below.
+                print(f"⚠ Task2 TransUNet helper unavailable ({e}). Falling back to generic loader.")
 
         # First try TorchScript
         try:
@@ -206,6 +233,26 @@ class RealSegmenter:
 
     def predict(self, image: Image.Image) -> dict:
         """Run real model inference and return SegmentationResult dict."""
+        if self._predict_fn is not None:
+            pred = self._predict_fn(image)
+            results = {}
+            for attr in ATTRIBUTES:
+                m = pred.masks.get(attr)
+                if m is None:
+                    m = np.zeros((image.height, image.width), dtype=np.uint8)
+                conf = float(pred.confidence.get(attr, 0.0))
+                cov = float(pred.coverage_pct.get(attr, 0.0))
+                present = cov > 0.3
+                results[attr] = SegmentationResult(
+                    attribute=attr,
+                    label=ATTRIBUTE_LABELS[attr],
+                    mask=m.astype(np.uint8),
+                    confidence=round(float(np.clip(conf, 0.0, 1.0)), 3),
+                    coverage_pct=round(float(max(0.0, cov)), 2),
+                    present=present,
+                )
+            return results
+
         try:
             import torch
         except ImportError:
@@ -300,6 +347,7 @@ def get_segmenter(model_path: Optional[str] = None):
     if model_path and os.path.exists(model_path):
         try:
             return RealSegmenter(model_path)
-        except NotImplementedError:
+        except Exception as e:
+            print(f"⚠ RealSegmenter init failed ({e}). Falling back to MockSegmenter.")
             pass
     return MockSegmenter()

@@ -142,6 +142,7 @@ class RealClassifier:
         self.model = None
         self.device = None
         self.input_size = int(os.environ.get("TASK3_INPUT_SIZE", "224"))
+        self._predict_fn = None
         self._load_model()
 
     def _load_model(self):
@@ -160,6 +161,28 @@ class RealClassifier:
             raise RuntimeError("PyTorch is required for RealClassifier.") from e
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        # Preferred path: ISIC helper (supports model_state checkpoints directly).
+        model_type = os.environ.get("TASK3_MODEL_TYPE", "auto").lower()
+        if model_type in ("auto", "isic"):
+            try:
+                from models.task3_classifier.isic_checkpoint_infer import build_isic_predict_fn
+
+                backbone = os.environ.get("TASK3_BACKBONE", "efficientnet_v2_s")
+                source_dir = os.environ.get("TASK3_SOURCE_DIR", "")
+                self._predict_fn = build_isic_predict_fn(
+                    checkpoint_path=self.model_path,
+                    backbone=backbone,
+                    num_classes=len(DISEASE_CLASSES),
+                    source_dir=source_dir or None,
+                    device=str(self.device),
+                )
+                self.model_name = f"RealClassifier[ISIC:{backbone}:{os.path.basename(self.model_path)}]"
+                return
+            except Exception as e:
+                if model_type == "isic":
+                    raise
+                print(f"⚠ Task3 ISIC helper unavailable ({e}). Falling back to generic loader.")
 
         # First try TorchScript
         try:
@@ -201,6 +224,29 @@ class RealClassifier:
 
     def predict(self, image: Image.Image, top_k: int = 3) -> ClassificationResult:
         """Run real model inference and return calibrated top-k diagnoses."""
+        if self._predict_fn is not None:
+            pred = self._predict_fn(image, top_k=top_k)
+            probs = pred.probabilities
+            sorted_items = sorted(probs.items(), key=lambda x: x[1], reverse=True)
+            top_entries = []
+            for code, conf in sorted_items[:top_k]:
+                top_entries.append(DiagnosisEntry(
+                    code=code,
+                    name=DISEASE_FULL_NAMES.get(code, code),
+                    confidence=round(float(conf), 4),
+                    risk_level=DISEASE_RISK_LEVELS.get(code, "LOW"),
+                ))
+
+            primary_code = sorted_items[0][0]
+            primary_conf = float(sorted_items[0][1])
+            return ClassificationResult(
+                top_k=top_entries,
+                all_probabilities={k: float(v) for k, v in probs.items()},
+                is_uncertain=primary_conf < 0.5,
+                primary_diagnosis=primary_code,
+                primary_confidence=round(primary_conf, 4),
+            )
+
         try:
             import torch
         except ImportError:
@@ -293,6 +339,7 @@ def get_classifier(model_path: Optional[str] = None):
     if model_path and os.path.exists(model_path):
         try:
             return RealClassifier(model_path)
-        except NotImplementedError:
+        except Exception as e:
+            print(f"⚠ RealClassifier init failed ({e}). Falling back to MockClassifier.")
             pass
     return MockClassifier()

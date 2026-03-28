@@ -44,6 +44,7 @@ class ClinicalContext:
 
     # Risk indicators
     risk_flags: List[str]
+    rule_tags: List[str]
 
     # Combined context string for LLM
     context_text: str
@@ -133,6 +134,30 @@ def build_context(
     if "pigment_network" in struct_names and primary not in ("MEL", "NV"):
         risk_flags.append("⚠️ Pigment network detected — typically melanocytic, but diagnosis is non-melanocytic")
 
+    # ─── Rule tags (for retrieval/reranking) ───
+    rule_tags = []
+    if primary in {"MEL", "BCC"}:
+        rule_tags.append("high_risk")
+    if primary == "AKIEC":
+        rule_tags.append("premalignant_pattern")
+    if primary in {"MEL", "NV", "DF"} or "pigment_network" in struct_names:
+        rule_tags.append("melanocytic_pattern")
+    if primary == "BKL":
+        rule_tags.append("keratin_pattern")
+    if primary == "VASC":
+        rule_tags.append("vascular_pattern")
+    if "streaks" in struct_names:
+        rule_tags.append("high_risk_growth")
+    if "negative_network" in struct_names:
+        rule_tags.append("atypical_network")
+    if "milia_like_cyst" in struct_names:
+        rule_tags.append("benign_keratosis_clue")
+    if classification_result.is_uncertain:
+        rule_tags.append("model_uncertainty")
+    if not detected:
+        rule_tags.append("no_specific_structure")
+    rule_tags = sorted(set(rule_tags))
+
     # ─── Context text for LLM ───
     ctx_parts = [
         "=== DERMOSCOPY IMAGE ANALYSIS ===",
@@ -162,6 +187,8 @@ def build_context(
         ctx_parts += ["", "--- Risk Indicators ---"]
         for flag in risk_flags:
             ctx_parts.append(f"  {flag}")
+    if rule_tags:
+        ctx_parts += ["", "--- Rule Tags ---", "  " + ", ".join(rule_tags)]
 
     if patient_metadata:
         ctx_parts += ["", "--- Patient Information ---"]
@@ -175,6 +202,8 @@ def build_context(
     if detected:
         search_parts.append("dermoscopy image with " + ", ".join(s.attribute.replace("_", " ") for s in detected))
     search_parts.append(f"diagnosis {primary_name}")
+    if rule_tags:
+        search_parts.append("rule tags " + ", ".join(t.replace("_", " ") for t in rule_tags))
     search_query = " ".join(search_parts)
 
     return ClinicalContext(
@@ -188,6 +217,7 @@ def build_context(
         is_uncertain=classification_result.is_uncertain,
         risk_level=risk_level,
         risk_flags=risk_flags,
+        rule_tags=rule_tags,
         context_text=context_text,
         search_query=search_query,
         patient_metadata=patient_metadata,

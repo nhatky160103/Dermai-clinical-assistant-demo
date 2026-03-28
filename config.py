@@ -38,8 +38,23 @@ VERTEX_BASE_URL = os.environ.get(
     "VERTEX_BASE_URL",
     "https://generativelanguage.googleapis.com/v1beta/openai",
 )
+VERTEX_REST_BASE_URL = os.environ.get(
+    "VERTEX_REST_BASE_URL",
+    "https://aiplatform.googleapis.com/v1",
+)
+# Gemini API-key mode (recommended for local demo)
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", VERTEX_API_KEY)
+GEMINI_BASE_URL = os.environ.get(
+    "GEMINI_BASE_URL",
+    "https://generativelanguage.googleapis.com/v1beta/openai",
+)
+GEMINI_REST_BASE_URL = os.environ.get(
+    "GEMINI_REST_BASE_URL",
+    "https://generativelanguage.googleapis.com/v1beta",
+)
 LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-4o-mini")
 VERTEX_MODEL = os.environ.get("VERTEX_MODEL", "gemini-2.0-flash")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", VERTEX_MODEL)
 
 # ──────────────────────────────────────────────────────────────── Task 2: Segmentation
 ATTRIBUTES = [
