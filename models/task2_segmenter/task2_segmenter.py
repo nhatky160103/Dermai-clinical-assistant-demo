@@ -32,7 +32,7 @@ class SegmentationResult:
 class MockSegmenter:
     """
     Mock segmenter — generates realistic-looking masks using noise + morphology.
-    Simulates output of a SegFormer / TransUNet model.
+    Simulates output of a dermoscopic structure segmentation model.
     """
 
     def __init__(self):
@@ -137,8 +137,7 @@ class MockSegmenter:
 
 class RealSegmenter:
     """
-    Real segmenter — loads trained SegFormer / TransUNet weights.
-    TODO: Implement when model weights are available.
+    Real segmenter — loads trained Task 2 segmentation weights.
     """
 
     def __init__(self, model_path: str):

@@ -9,20 +9,17 @@ Usage:
     # Then open http://localhost:7860 in your browser
 
 Environment variables:
-    LLM_PROVIDER        — "openai" (default) or "vertex"
-    OPENAI_API_KEY      — OpenAI API key (optional, fallback to rule-based)
-    OPENAI_BASE_URL     — Custom API base URL (default: OpenAI)
-    LLM_MODEL           — Model name (default: gpt-4o-mini)
-    VERTEX_API_KEY      — Vertex/Gemini API key for OpenAI-compatible endpoint
-    VERTEX_BASE_URL     — Vertex/Gemini OpenAI-compatible base URL
-    VERTEX_MODEL        — Model name for Vertex/Gemini (default: gemini-2.0-flash)
-    TASK2_MODEL_PATH    — Path to Task 2 model weights (optional)
-    TASK2_MODEL_FACTORY — Factory for Task 2 state_dict: "module.path:create_model"
-    TASK2_INPUT_SIZE    — Input size for Task 2 real model (default: 256)
-    TASK2_THRESHOLD     — Segmentation threshold for Task 2 (default: 0.5)
-    TASK3_MODEL_PATH    — Path to Task 3 model weights (optional)
-    TASK3_MODEL_FACTORY — Factory for Task 3 state_dict: "module.path:create_model"
-    TASK3_INPUT_SIZE    — Input size for Task 3 real model (default: 224)
+    LLM_PROVIDER               — LLM backend selector
+    GEMINI_API_KEY             — Gemini API key for REST/OpenAI-compatible access
+    GEMINI_MODEL               — Gemini model name
+    TASK2_MODEL_PATH           — Path to Task 2 model weights
+    TASK2_MODEL_TYPE           — "transunet" for notebook-compatible Task 2 loading
+    TASK2_TRANSUNET_SOURCE_DIR — Root directory containing TransUNet `networks/`
+    TASK2_TRANSUNET_IMG_SIZE   — Task 2 inference image size
+    TASK2_TRANSUNET_VIT_NAME   — Task 2 ViT backbone name
+    TASK3_MODEL_PATH           — Path to Task 3 model weights
+    TASK3_MODEL_TYPE           — "isic" for repository classifier loader
+    TASK3_BACKBONE             — Task 3 backbone name
 """
 import os
 import sys
@@ -356,7 +353,7 @@ def create_ui():
             <h1>{APP_TITLE}</h1>
             <p>{APP_DESCRIPTION}</p>
             <p style="font-size: 0.8rem; color: #636d83; margin-top: 0.5rem;">
-                Powered by SegFormer (Task 2) • EfficientNet (Task 3) • CLIP Embeddings • ChromaDB RAG • LLM
+                Powered by TransUNet (Task 2) • EfficientNet (Task 3) • CLIP • ChromaDB RAG • LLM
             </p>
         </div>
         """)
@@ -483,7 +480,7 @@ def create_ui():
                 clinical examination and professional medical judgment.
             </p>
             <p style="font-size: 0.75rem; color: #4a5568; margin-top: 0.5rem;">
-                ISIC 2018 Challenge • SegFormer + EfficientNet + CLIP + ChromaDB + LLM Pipeline
+                ISIC 2018 Challenge • TransUNet + EfficientNet + CLIP + ChromaDB + LLM Pipeline
             </p>
         </div>
         """)

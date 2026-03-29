@@ -1,7 +1,6 @@
 # Part 1: Data Exploration and Analysis
-> ISIC 2018 — Mole Network Structure Analysis | Belle AI Technical Test
 
----
+
 
 ## Q1. Describe the Dataset
 
@@ -17,18 +16,35 @@ The challenge attracted 900 registered teams and 299 total submissions across 3 
 | **Task 2** | **Dermoscopic Attribute Detection** | **5 binary masks per image** |
 | Task 3 | Disease Classification | 1 label per image (7 classes) |
 
-Tasks 1 and 2 share the same input images. Task 1 answers *"Where is the lesion?"* and Task 2 answers *"What dermoscopic structures are present?"*. They are evaluated independently.
+Tasks 1 and 2 share the same input images. 
+* Task 1 answers *"Where is the lesion?"* 
+* Task 2 answers *"What dermoscopic structures are present?"*. 
+* Task 3 answers *"What is the lesion diagnosis class?"*.
+* They are evaluated independently.
 
-### Dataset Size (Task 1 & 2)
+### Dataset Size
 
-| Split | Images | Task 1 Masks | Task 2 Masks (×5) |
+| Split | Images | Task 1 Masks | Task 2 Masks (×5) | 
 |-------|-------:|-------------:|------------------:|
-| Training | 2,594 | 2,594 | 12,970 |
+| Training | 2,594 | 2,594 | 12,970 | 10015  |
 | Validation | 100 | 100 | 500 |
-| Test | 1,000 | 1,000 | 5,000 |
+| Test | 1,000 | 1,000 | 5,000 | 
 | **Total** | **3,694** | **3,694** | **18,470** |
 
-### Task 2 — 5 Dermoscopic Structures
+
+| Split | Task 3 image/label |
+|------------------:|--------------:|
+| Training  | 10015  |
+| Validation  | 193 |
+| Test | 1512 |
+| **Total**| **11720** |
+
+### Task 1: Label
+
+- `lesion`: binary segmentation mask (lesion vs background)
+
+
+### Task 2: 5 Dermoscopic Structures
 
 | Structure | Clinical Description |
 |-----------|---------------------|
@@ -40,11 +56,33 @@ Tasks 1 and 2 share the same input images. Task 1 answers *"Where is the lesion?
 
 Per the official challenge definition, attribute annotations are made within the full dermoscopic image — not constrained to the Task 1 lesion boundary, since some structures (e.g., streaks) by clinical definition can extend beyond the lesion edge.
 
+### Task 3: 7 Diagnosis Labels
+
+- `MEL`: Melanoma
+- `NV`: Melanocytic nevus
+- `BCC`: Basal cell carcinoma
+- `AKIEC`: Actinic keratosis / Bowen's disease
+- `BKL`: Benign keratosis-like lesion
+- `DF`: Dermatofibroma
+- `VASC`: Vascular lesion
+
 ---
 
 ## Q2. Analyze the Quality of Annotations
 
-### 2.1 Class Distribution
+### 2.1 Task 1 — Annotation Quality (Boundary Segmentation)
+
+- Task 1 uses binary lesion masks, which are generally more consistent than Task 2 attribute masks.
+- However, boundary placement still has expert variability. The challenge paper reports inter-expert Jaccard values `0.743`, `0.754`, and `0.861` (mean `0.786`) on a sampled set.
+- Practical implication: Task 1 labels are higher quality than Task 2, but still include non-trivial boundary uncertainty (especially around fuzzy lesion edges).
+
+### 2.2 Task 2 — Annotation Quality (Dermoscopic Structures)
+
+
+Detail in [notebook](https://www.kaggle.com/code/kydinhnhat/isic-2018-data-exploration-and-analysis)
+
+
+#### 2.2.1 Class Distribution 
 
 **From EDA on training set (n = 2,594 images):**
 
@@ -58,7 +96,7 @@ Per the official challenge definition, attribute annotations are made within the
 
 There is a **15× imbalance** between `pigment_network` (58.7%) and `streaks` (3.9%). This pattern is consistent across the full dataset (train + val + test): according to DatasetNinja, across all 3,694 Task 2 images, `pigment_network` appears in 2,244 images while `streaks` appears in only 183 images.
 
-### 2.2 Coverage and Scale Characteristics
+#### 2.2.2 Coverage and Scale Characteristics
 
 Even when present, mask coverage is very small for most structures:
 
@@ -68,7 +106,7 @@ Even when present, mask coverage is very small for most structures:
 - `globules`: average object area 0.59% per object, but with up to 4.57 objects per image on average — these are discrete multi-instance structures
 - Median coverage is consistently lower than mean for all structures, confirming right-skewed distributions with few large outliers
 
-### 2.3 Annotation Quality — Official Assessment
+#### 2.2.3 Official Assessment
 
 The challenge organizers explicitly acknowledge in Codella et al. (2019) that ground truth masks are influenced by inter-observer and intra-observer variability due to differences between human annotators and annotation software. An ideal evaluation would use multiple annotators per image, but this was deemed impractical.
 
@@ -76,13 +114,13 @@ For Task 1, prior work measured inter-annotator agreement between 3 experts on 1
 
 For Task 2, Codella et al. (2019) note directly that poor model performance on this task may result from the fact that dermoscopic attributes tend to have poor inter-observer correlation among expert clinicians, citing Carrera et al. (JAMA Dermatology, 2016). The annotation noise is therefore not just a data collection artifact — it reflects genuine clinical disagreement about these structures.
 
-### 2.4 Annotation Quality — Benchmark Results as Evidence
+#### 2.2.4 Benchmark Results as Evidence
 
-Only **26 teams** submitted to Task 2, compared to 112 for Task 1 and 141 for Task 3. The best Task 2 submission achieved an average Jaccard of only **0.473**, while the best Task 1 submission achieved **0.802**. This gap cannot be explained solely by model limitations — it reflects inherent difficulty caused by annotation ambiguity.
+Only **26 teams** submitted to Task 2, compared to 112 for Task 1 and 141 for Task 3. The best Task 2 submission achieved an average Jaccard of only **0.473** (Official public leaderboard is 0.307), while the best Task 1 submission achieved **0.802**. This gap cannot be explained solely by model limitations — it reflects inherent difficulty caused by annotation ambiguity.
 
 The challenge paper itself concludes that poor Task 2 performance may imply that the field of clinical dermoscopic attributes must mature further before machine learning can be effectively applied.
 
-### 2.5 Annotation Consistency Flags from EDA
+#### 2.2.5 Annotation Consistency Flags from EDA
 
 **Tiny masks (coverage < 0.1%)** labeled as "present" are likely borderline or ambiguous cases, annotation errors, or structures at the resolution limit of the annotation tool.
 
@@ -90,13 +128,23 @@ The challenge paper itself concludes that poor Task 2 performance may imply that
 
 **Many zero-structure images** — a notable fraction of training images have 0 Task 2 annotations, meaning the lesion exists (Task 1 mask present) but no specific dermoscopic attribute was annotated. This may reflect genuine absence, annotator fatigue, or subthreshold structures.
 
+### 2.3 Task 3 — Annotation Quality (Diagnosis Classification)
+
+- Task 3 labels are image-level diagnosis labels (not pixel-level), with confirmation metadata in supplemental files.
+- `diagnosis_confirm_type` is important for label trust level:
+  - `histopathology` (strongest confirmation)
+  - `serial imaging showing no change`
+  - `single image expert consensus`
+- The supplemental `lesion_id` grouping indicates multiple images can belong to one lesion; this is useful for leakage-aware split design and for interpreting label consistency across views.
+
 ---
 
 ## Q3. How Annotation Quality May Affect the Model
 
 ### 3.1 Class Imbalance → Failure on Rare Structures
 
-With a 15× prevalence gap, a model trained with standard Binary Cross-Entropy loss will learn to always predict "absent" for `streaks` and `negative_network`. This achieves high pixel accuracy while being clinically useless for these structures. Mitigation requires weighted loss functions such as Weighted BCE or Focal Loss, and balanced sampling strategies.
+With a 15× prevalence gap, a model trained with standard Binary Cross-Entropy loss tends to be biased toward predicting "absent" for rare structures such as `streaks` and `negative_network`. This can keep pixel accuracy high while reducing clinically useful recall for minority attributes. Mitigation requires weighted loss functions such as Weighted BCE or Focal Loss, and balanced sampling strategies.
+In screening-oriented medical settings, recall (sensitivity) is typically prioritized over precision for high-risk findings, because false negatives (missed disease) are usually more critical than false positives.
 
 ### 3.2 Irreducible Annotation Noise → Performance Ceiling
 

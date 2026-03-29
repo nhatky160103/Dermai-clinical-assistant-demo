@@ -1,0 +1,13 @@
+services:
+  dermai:
+    image: ${DERMAI_IMAGE}
+    container_name: dermai-app
+    ports:
+      - "7860:7860"
+    env_file:
+      - .env
+    volumes:
+      - ./data/chroma_db:/app/data/chroma_db
+      - ./data/reference_cases:/app/data/reference_cases:ro
+      - ./models:/app/models:ro
+    restart: unless-stopped

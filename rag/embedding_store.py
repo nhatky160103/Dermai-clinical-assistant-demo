@@ -140,6 +140,50 @@ class EmbeddingStore:
         embedding = model.encode(image, convert_to_numpy=True)
         return embedding.tolist()
 
+    @staticmethod
+    def _normalize_embedding(embedding: Optional[List[float]]) -> Optional[np.ndarray]:
+        """L2-normalize an embedding for stable hybrid fusion."""
+        if embedding is None:
+            return None
+        vector = np.asarray(embedding, dtype=np.float32)
+        norm = np.linalg.norm(vector)
+        if norm == 0:
+            return None
+        return vector / norm
+
+    def _build_query_embedding(
+        self,
+        query_text: str,
+        query_image: Optional[Image.Image] = None,
+    ) -> Optional[List[float]]:
+        """
+        Build one query embedding from both image and text when available.
+
+        CLIP places image and text in a shared embedding space, so a weighted
+        fusion can combine visual similarity with structured clinical context.
+        """
+        image_embedding = self._normalize_embedding(
+            self.encode_image(query_image) if query_image is not None else None
+        )
+        text_embedding = self._normalize_embedding(
+            self.encode_text(query_text) if query_text else None
+        )
+
+        if image_embedding is not None and text_embedding is not None:
+            image_weight = 0.6
+            text_weight = 0.4
+            fused = image_weight * image_embedding + text_weight * text_embedding
+            fused_norm = np.linalg.norm(fused)
+            if fused_norm == 0:
+                return None
+            return (fused / fused_norm).tolist()
+
+        if image_embedding is not None:
+            return image_embedding.tolist()
+        if text_embedding is not None:
+            return text_embedding.tolist()
+        return None
+
     def add_reference_case(
         self,
         case_id: str,
@@ -203,14 +247,10 @@ class EmbeddingStore:
         if not self._initialized or self._collection.count() == 0:
             return self._fallback_search(query_text, top_k)
 
-        # Try image embedding first, fall back to text
-        if query_image is not None:
-            embedding = self.encode_image(query_image)
-        else:
-            embedding = None
-
-        if embedding is None:
-            embedding = self.encode_text(query_text)
+        embedding = self._build_query_embedding(
+            query_text=query_text,
+            query_image=query_image,
+        )
 
         if embedding is None:
             return self._fallback_search(query_text, top_k)

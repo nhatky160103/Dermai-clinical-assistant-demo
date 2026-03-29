@@ -10,7 +10,42 @@
     ],
     "description": "Dermoscopy of melanoma showing atypical pigment network with irregular meshes, radial streaks at periphery indicating radial growth phase, and irregularly distributed brown-black globules. Asymmetric pattern with multiple colors (brown, black, blue-gray). These features strongly suggest malignancy and warrant immediate excisional biopsy.",
     "clinical_notes": "Asymmetric lesion, irregular borders, diameter > 6mm. ABCDE criteria positive.",
-    "source": "ISIC 2018 Training Set — HAM10000"
+    "source": "ISIC 2018 Training Set — HAM10000",
+    "task2_features": {
+      "pigment_network": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      },
+      "streaks": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      },
+      "negative_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "milia_like_cyst": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "globules": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      }
+    },
+    "diagnosis_confirm_type": "single image expert consensus",
+    "evidence_weight": 0.6,
+    "rule_tags": [
+      "high_risk",
+      "high_risk_growth",
+      "melanocytic_pattern"
+    ],
+    "clinical_text": "Diagnosis: Melanoma (MEL). Structures: pigment network, streaks, globules. Task2 features: pigment network(coverage=3.0%, conf=0.70), streaks(coverage=3.0%, conf=0.70), globules(coverage=3.0%, conf=0.70). Description: Dermoscopy of melanoma showing atypical pigment network with irregular meshes, radial streaks at periphery indicating radial growth phase, and irregularly distributed brown-black globules. Asymmetric pattern with multiple colors (brown, black, blue-gray). These features strongly suggest malignancy and warrant immediate excisional biopsy. Clinical notes: Asymmetric lesion, irregular borders, diameter > 6mm. ABCDE criteria positive. Rule tags: high_risk, high_risk_growth, melanocytic_pattern. Confirmation type: single image expert consensus (evidence weight=0.60)."
   },
   {
     "case_id": "ref_mel_002",
@@ -22,7 +57,42 @@
     ],
     "description": "Superficial spreading melanoma with prominent atypical pigment network and areas of negative network (inverse pattern). The negative network creates a serpiginous pattern of hypopigmented lines surrounding darker structures. Multiple regression areas visible.",
     "clinical_notes": "Changing lesion with regression zones. Breslow thickness assessment needed.",
-    "source": "ISIC 2018 Training Set — MSK Dataset"
+    "source": "ISIC 2018 Training Set — MSK Dataset",
+    "task2_features": {
+      "pigment_network": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      },
+      "streaks": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "negative_network": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      },
+      "milia_like_cyst": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "globules": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      }
+    },
+    "diagnosis_confirm_type": "single image expert consensus",
+    "evidence_weight": 0.6,
+    "rule_tags": [
+      "atypical_network",
+      "high_risk",
+      "melanocytic_pattern"
+    ],
+    "clinical_text": "Diagnosis: Melanoma (MEL). Structures: pigment network, negative network. Task2 features: pigment network(coverage=3.0%, conf=0.70), negative network(coverage=3.0%, conf=0.70). Description: Superficial spreading melanoma with prominent atypical pigment network and areas of negative network (inverse pattern). The negative network creates a serpiginous pattern of hypopigmented lines surrounding darker structures. Multiple regression areas visible. Clinical notes: Changing lesion with regression zones. Breslow thickness assessment needed. Rule tags: atypical_network, high_risk, melanocytic_pattern. Confirmation type: single image expert consensus (evidence weight=0.60)."
   },
   {
     "case_id": "ref_nv_001",
@@ -34,7 +104,40 @@
     ],
     "description": "Dermoscopy of compound melanocytic nevus showing regular pigment network with homogeneous brown meshes becoming thinner at periphery. Symmetric globular pattern with regular brown globules distributed uniformly. Classic benign pattern.",
     "clinical_notes": "Stable lesion, symmetric, uniform color. No change reported by patient.",
-    "source": "ISIC 2018 Training Set — HAM10000"
+    "source": "ISIC 2018 Training Set — HAM10000",
+    "task2_features": {
+      "pigment_network": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      },
+      "streaks": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "negative_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "milia_like_cyst": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "globules": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      }
+    },
+    "diagnosis_confirm_type": "single image expert consensus",
+    "evidence_weight": 0.6,
+    "rule_tags": [
+      "melanocytic_pattern"
+    ],
+    "clinical_text": "Diagnosis: Melanocytic Nevus (NV). Structures: pigment network, globules. Task2 features: pigment network(coverage=3.0%, conf=0.70), globules(coverage=3.0%, conf=0.70). Description: Dermoscopy of compound melanocytic nevus showing regular pigment network with homogeneous brown meshes becoming thinner at periphery. Symmetric globular pattern with regular brown globules distributed uniformly. Classic benign pattern. Clinical notes: Stable lesion, symmetric, uniform color. No change reported by patient. Rule tags: melanocytic_pattern. Confirmation type: single image expert consensus (evidence weight=0.60)."
   },
   {
     "case_id": "ref_nv_002",
@@ -45,7 +148,40 @@
     ],
     "description": "Junctional melanocytic nevus with typical reticular pattern. Regular pigment network with uniform mesh size and line thickness. Symmetric distribution. Fading of network at lesion borders is a reassuring sign of benignity.",
     "clinical_notes": "Flat lesion, stable over time. Regular dermoscopic pattern.",
-    "source": "ISIC 2018 Training Set — HAM10000"
+    "source": "ISIC 2018 Training Set — HAM10000",
+    "task2_features": {
+      "pigment_network": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      },
+      "streaks": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "negative_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "milia_like_cyst": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "globules": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      }
+    },
+    "diagnosis_confirm_type": "single image expert consensus",
+    "evidence_weight": 0.6,
+    "rule_tags": [
+      "melanocytic_pattern"
+    ],
+    "clinical_text": "Diagnosis: Melanocytic Nevus (NV). Structures: pigment network. Task2 features: pigment network(coverage=3.0%, conf=0.70). Description: Junctional melanocytic nevus with typical reticular pattern. Regular pigment network with uniform mesh size and line thickness. Symmetric distribution. Fading of network at lesion borders is a reassuring sign of benignity. Clinical notes: Flat lesion, stable over time. Regular dermoscopic pattern. Rule tags: melanocytic_pattern. Confirmation type: single image expert consensus (evidence weight=0.60)."
   },
   {
     "case_id": "ref_bcc_001",
@@ -57,7 +193,41 @@
     ],
     "description": "Basal cell carcinoma showing blue-gray ovoid nests (globules) and areas resembling negative network. Arborizing telangiectasia visible. Absence of pigment network confirms non-melanocytic origin. Ulceration and shiny white structures present.",
     "clinical_notes": "Non-melanocytic lesion with BCC-specific features. Biopsy recommended.",
-    "source": "ISIC 2018 Training Set — HAM10000"
+    "source": "ISIC 2018 Training Set — HAM10000",
+    "task2_features": {
+      "pigment_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "streaks": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "negative_network": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      },
+      "milia_like_cyst": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "globules": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      }
+    },
+    "diagnosis_confirm_type": "single image expert consensus",
+    "evidence_weight": 0.6,
+    "rule_tags": [
+      "atypical_network",
+      "high_risk"
+    ],
+    "clinical_text": "Diagnosis: Basal Cell Carcinoma (BCC). Structures: globules, negative network. Task2 features: negative network(coverage=3.0%, conf=0.70), globules(coverage=3.0%, conf=0.70). Description: Basal cell carcinoma showing blue-gray ovoid nests (globules) and areas resembling negative network. Arborizing telangiectasia visible. Absence of pigment network confirms non-melanocytic origin. Ulceration and shiny white structures present. Clinical notes: Non-melanocytic lesion with BCC-specific features. Biopsy recommended. Rule tags: atypical_network, high_risk. Confirmation type: single image expert consensus (evidence weight=0.60)."
   },
   {
     "case_id": "ref_bcc_002",
@@ -69,7 +239,41 @@
     ],
     "description": "Pigmented basal cell carcinoma with spoke-wheel structures, blue-gray globules, and crystalline (shiny white) structures visible under polarized dermoscopy. The negative network pattern helps distinguish from melanocytic lesions.",
     "clinical_notes": "Pearly papule with telangiectasia. Mohs surgery may be indicated.",
-    "source": "ISIC 2018 Training Set — MSK Dataset"
+    "source": "ISIC 2018 Training Set — MSK Dataset",
+    "task2_features": {
+      "pigment_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "streaks": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "negative_network": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      },
+      "milia_like_cyst": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "globules": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      }
+    },
+    "diagnosis_confirm_type": "single image expert consensus",
+    "evidence_weight": 0.6,
+    "rule_tags": [
+      "atypical_network",
+      "high_risk"
+    ],
+    "clinical_text": "Diagnosis: Basal Cell Carcinoma (BCC). Structures: negative network, globules. Task2 features: negative network(coverage=3.0%, conf=0.70), globules(coverage=3.0%, conf=0.70). Description: Pigmented basal cell carcinoma with spoke-wheel structures, blue-gray globules, and crystalline (shiny white) structures visible under polarized dermoscopy. The negative network pattern helps distinguish from melanocytic lesions. Clinical notes: Pearly papule with telangiectasia. Mohs surgery may be indicated. Rule tags: atypical_network, high_risk. Confirmation type: single image expert consensus (evidence weight=0.60)."
   },
   {
     "case_id": "ref_akiec_001",
@@ -80,7 +284,41 @@
     ],
     "description": "Actinic keratosis showing surface scale and subtle white-yellow milia-like cysts. Strawberry pattern with erythematous pseudo-network. Hair follicle openings preserved. Targetoid follicular openings visible on sun-damaged skin.",
     "clinical_notes": "Sun-exposed area, rough scaly surface. Monitor for SCC transformation.",
-    "source": "ISIC 2018 Training Set — HAM10000"
+    "source": "ISIC 2018 Training Set — HAM10000",
+    "task2_features": {
+      "pigment_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "streaks": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "negative_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "milia_like_cyst": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      },
+      "globules": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      }
+    },
+    "diagnosis_confirm_type": "single image expert consensus",
+    "evidence_weight": 0.6,
+    "rule_tags": [
+      "benign_keratosis_clue",
+      "premalignant_pattern"
+    ],
+    "clinical_text": "Diagnosis: Actinic Keratosis (AKIEC). Structures: milia like cyst. Task2 features: milia like cyst(coverage=3.0%, conf=0.70). Description: Actinic keratosis showing surface scale and subtle white-yellow milia-like cysts. Strawberry pattern with erythematous pseudo-network. Hair follicle openings preserved. Targetoid follicular openings visible on sun-damaged skin. Clinical notes: Sun-exposed area, rough scaly surface. Monitor for SCC transformation. Rule tags: benign_keratosis_clue, premalignant_pattern. Confirmation type: single image expert consensus (evidence weight=0.60)."
   },
   {
     "case_id": "ref_bkl_001",
@@ -92,7 +330,41 @@
     ],
     "description": "Seborrheic keratosis with classic milia-like cysts (white-yellow round globules) and comedo-like openings. 'Brain-like' or cerebriform pattern. Sharp demarcation with stuck-on appearance. Fissures and ridges forming gyri and sulci pattern.",
     "clinical_notes": "Classic benign keratosis. No treatment needed unless cosmetically bothersome.",
-    "source": "ISIC 2018 Training Set — HAM10000"
+    "source": "ISIC 2018 Training Set — HAM10000",
+    "task2_features": {
+      "pigment_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "streaks": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "negative_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "milia_like_cyst": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      },
+      "globules": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      }
+    },
+    "diagnosis_confirm_type": "single image expert consensus",
+    "evidence_weight": 0.6,
+    "rule_tags": [
+      "benign_keratosis_clue",
+      "keratin_pattern"
+    ],
+    "clinical_text": "Diagnosis: Benign Keratosis (Seb. Keratosis) (BKL). Structures: milia like cyst, globules. Task2 features: milia like cyst(coverage=3.0%, conf=0.70), globules(coverage=3.0%, conf=0.70). Description: Seborrheic keratosis with classic milia-like cysts (white-yellow round globules) and comedo-like openings. 'Brain-like' or cerebriform pattern. Sharp demarcation with stuck-on appearance. Fissures and ridges forming gyri and sulci pattern. Clinical notes: Classic benign keratosis. No treatment needed unless cosmetically bothersome. Rule tags: benign_keratosis_clue, keratin_pattern. Confirmation type: single image expert consensus (evidence weight=0.60)."
   },
   {
     "case_id": "ref_bkl_002",
@@ -103,7 +375,41 @@
     ],
     "description": "Solar lentigo / flat seborrheic keratosis showing moth-eaten borders, fingerprint-like structures, and scattered milia-like cysts. Uniform brown color with sharp demarcation. No melanocytic features.",
     "clinical_notes": "Flat keratosis on sun-exposed area. Benign, stable appearance.",
-    "source": "ISIC 2018 Training Set — HAM10000"
+    "source": "ISIC 2018 Training Set — HAM10000",
+    "task2_features": {
+      "pigment_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "streaks": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "negative_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "milia_like_cyst": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      },
+      "globules": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      }
+    },
+    "diagnosis_confirm_type": "single image expert consensus",
+    "evidence_weight": 0.6,
+    "rule_tags": [
+      "benign_keratosis_clue",
+      "keratin_pattern"
+    ],
+    "clinical_text": "Diagnosis: Benign Keratosis (Seb. Keratosis) (BKL). Structures: milia like cyst. Task2 features: milia like cyst(coverage=3.0%, conf=0.70). Description: Solar lentigo / flat seborrheic keratosis showing moth-eaten borders, fingerprint-like structures, and scattered milia-like cysts. Uniform brown color with sharp demarcation. No melanocytic features. Clinical notes: Flat keratosis on sun-exposed area. Benign, stable appearance. Rule tags: benign_keratosis_clue, keratin_pattern. Confirmation type: single image expert consensus (evidence weight=0.60)."
   },
   {
     "case_id": "ref_df_001",
@@ -115,7 +421,40 @@
     ],
     "description": "Dermatofibroma with central white scar-like patch and peripheral delicate pigment network. Central white-to-yellow area with stellate shape. Ring-like globules at periphery. Classic dermoscopic pattern is pathognomonic.",
     "clinical_notes": "Firm papule that dimples on lateral compression. Benign, stable.",
-    "source": "ISIC 2018 Training Set — HAM10000"
+    "source": "ISIC 2018 Training Set — HAM10000",
+    "task2_features": {
+      "pigment_network": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      },
+      "streaks": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "negative_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "milia_like_cyst": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "globules": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      }
+    },
+    "diagnosis_confirm_type": "single image expert consensus",
+    "evidence_weight": 0.6,
+    "rule_tags": [
+      "melanocytic_pattern"
+    ],
+    "clinical_text": "Diagnosis: Dermatofibroma (DF). Structures: pigment network, globules. Task2 features: pigment network(coverage=3.0%, conf=0.70), globules(coverage=3.0%, conf=0.70). Description: Dermatofibroma with central white scar-like patch and peripheral delicate pigment network. Central white-to-yellow area with stellate shape. Ring-like globules at periphery. Classic dermoscopic pattern is pathognomonic. Clinical notes: Firm papule that dimples on lateral compression. Benign, stable. Rule tags: melanocytic_pattern. Confirmation type: single image expert consensus (evidence weight=0.60)."
   },
   {
     "case_id": "ref_vasc_001",
@@ -126,7 +465,40 @@
     ],
     "description": "Cherry angioma showing red-purple lacunae (globules) with well-demarcated round to oval structures. Homogeneous red-blue pattern without pigment network. White septa between lacunae create honeycomb-like pattern.",
     "clinical_notes": "Typical vascular lesion. No melanocytic features. Benign.",
-    "source": "ISIC 2018 Training Set — HAM10000"
+    "source": "ISIC 2018 Training Set — HAM10000",
+    "task2_features": {
+      "pigment_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "streaks": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "negative_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "milia_like_cyst": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "globules": {
+        "present": true,
+        "coverage_pct": 3.0,
+        "confidence": 0.7
+      }
+    },
+    "diagnosis_confirm_type": "single image expert consensus",
+    "evidence_weight": 0.6,
+    "rule_tags": [
+      "vascular_pattern"
+    ],
+    "clinical_text": "Diagnosis: Vascular Lesion (Angioma) (VASC). Structures: globules. Task2 features: globules(coverage=3.0%, conf=0.70). Description: Cherry angioma showing red-purple lacunae (globules) with well-demarcated round to oval structures. Homogeneous red-blue pattern without pigment network. White septa between lacunae create honeycomb-like pattern. Clinical notes: Typical vascular lesion. No melanocytic features. Benign. Rule tags: vascular_pattern. Confirmation type: single image expert consensus (evidence weight=0.60)."
   },
   {
     "case_id": "ref_vasc_002",
@@ -135,6 +507,40 @@
     "structures": [],
     "description": "Pyogenic granuloma with homogeneous reddish area and white collarette at base. No dermoscopic structures of melanocytic lesions. Vascular pattern with white rail lines. History of rapid growth and bleeding.",
     "clinical_notes": "Rapidly growing vascular lesion. Biopsy to rule out amelanotic melanoma.",
-    "source": "ISIC 2018 Training Set — MSK Dataset"
+    "source": "ISIC 2018 Training Set — MSK Dataset",
+    "task2_features": {
+      "pigment_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "streaks": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "negative_network": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "milia_like_cyst": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      },
+      "globules": {
+        "present": false,
+        "coverage_pct": 0.0,
+        "confidence": 0.0
+      }
+    },
+    "diagnosis_confirm_type": "single image expert consensus",
+    "evidence_weight": 0.6,
+    "rule_tags": [
+      "no_specific_structure",
+      "vascular_pattern"
+    ],
+    "clinical_text": "Diagnosis: Vascular Lesion (Pyogenic Granuloma) (VASC). Structures: no specific dermoscopic structure. Task2 features: no confident task2 feature. Description: Pyogenic granuloma with homogeneous reddish area and white collarette at base. No dermoscopic structures of melanocytic lesions. Vascular pattern with white rail lines. History of rapid growth and bleeding. Clinical notes: Rapidly growing vascular lesion. Biopsy to rule out amelanotic melanoma. Rule tags: no_specific_structure, vascular_pattern. Confirmation type: single image expert consensus (evidence weight=0.60)."
   }
 ]

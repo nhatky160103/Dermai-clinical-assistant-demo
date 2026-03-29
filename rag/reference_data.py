@@ -1,7 +1,8 @@
 """
-Reference Data loader + enrich logic for dermoscopy knowledge base.
+Reference Data loader + validation/enrichment logic for dermoscopy knowledge base.
 
 Primary storage is JSON in data/reference_cases/*.json (not hardcoded in Python).
+`structures` and `task2_features` are expected to be explicitly curated in JSON.
 """
 import os
 import json
@@ -55,21 +56,23 @@ def _load_reference_cases() -> List[Dict[str, Any]]:
 REFERENCE_CASES = _load_reference_cases()
 
 
-def _default_task2_features(structures: List[str]) -> Dict[str, Dict[str, float]]:
-    sset = set(structures or [])
+def _empty_task2_features() -> Dict[str, Dict[str, float]]:
+    """
+    Create an empty Task2 feature map.
+    This is only used for normalization fallback, not for synthesizing positive findings.
+    """
     features: Dict[str, Dict[str, float]] = {}
     for label in TASK2_LABELS:
-        present = label in sset
         features[label] = {
-            "present": bool(present),
-            "coverage_pct": 3.0 if present else 0.0,
-            "confidence": 0.7 if present else 0.0,
+            "present": False,
+            "coverage_pct": 0.0,
+            "confidence": 0.0,
         }
     return features
 
 
 def _normalize_task2_features(task2_features: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, float]]:
-    normalized = _default_task2_features([])
+    normalized = _empty_task2_features()
     if not isinstance(task2_features, dict):
         return normalized
 
@@ -86,15 +89,6 @@ def _normalize_task2_features(task2_features: Dict[str, Dict[str, Any]]) -> Dict
             "confidence": min(max(0.0, confidence), 1.0),
         }
     return normalized
-
-
-def _structures_from_task2(task2_features: Dict[str, Dict[str, float]]) -> List[str]:
-    out = []
-    for label in TASK2_LABELS:
-        feat = task2_features.get(label, {})
-        if bool(feat.get("present", False)):
-            out.append(label)
-    return out
 
 
 def _infer_rule_tags(diagnosis: str, structures: List[str]) -> List[str]:
@@ -149,12 +143,22 @@ def _build_clinical_text(case: Dict[str, Any]) -> str:
 
 def _enrich_case(case: Dict[str, Any]) -> Dict[str, Any]:
     enriched = dict(case)
-    task2_features = enriched.get("task2_features")
-    if task2_features is None:
-        task2_features = _default_task2_features(enriched.get("structures", []))
-    task2_features = _normalize_task2_features(task2_features)
+    task2_features = _normalize_task2_features(enriched.get("task2_features"))
     enriched["task2_features"] = task2_features
-    enriched["structures"] = _structures_from_task2(task2_features)
+
+    raw_structures = enriched.get("structures", [])
+    if not isinstance(raw_structures, list):
+        raw_structures = []
+    # Keep structures from curated data file as source of truth (no runtime synthesis).
+    enriched["structures"] = [s for s in raw_structures if s in TASK2_LABELS]
+    present_from_task2 = sorted(
+        [label for label, feat in task2_features.items() if bool(feat.get("present", False))]
+    )
+    if sorted(enriched["structures"]) != present_from_task2:
+        print(
+            f"⚠ Case {enriched.get('case_id', 'unknown')} has structure/task2_features mismatch. "
+            "Please curate JSON for consistency."
+        )
 
     confirm_type = enriched.get("diagnosis_confirm_type", "single image expert consensus")
     weight = CONFIRM_TYPE_WEIGHTS.get(confirm_type, 0.6)

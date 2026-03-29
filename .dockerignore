@@ -1,0 +1,22 @@
+.git
+.gitignore
+.venv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.ipynb
+.DS_Store
+
+# local runtime / editor
+.vscode/
+.idea/
+
+# optional: don't bake local env secrets
+.env
+
+# large mutable runtime data should be mounted
+# data/chroma_db is mounted via docker-compose
+
+# model checkpoints (mount at runtime instead of baking into image)
+**/weights/

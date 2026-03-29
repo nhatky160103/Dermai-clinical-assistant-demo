@@ -1,8 +1,8 @@
 """
 Image Search — RAG-based similar case retrieval for dermoscopy images.
 
-Combines CLIP image embeddings with text-based context search
-for hybrid similarity matching against the reference database.
+Combines CLIP image and text embeddings for hybrid similarity matching
+against the reference database.
 """
 from typing import List, Optional
 from PIL import Image
@@ -58,8 +58,8 @@ def search_similar_cases(
 ) -> List[ReferenceCase]:
     """
     Search for similar reference cases using:
-    1. CLIP image embedding (visual similarity)
-    2. Text context (detected structures + diagnosis)
+    1. Hybrid CLIP query embedding from image + clinical context text
+    2. Clinical metadata reranking after vector retrieval
 
     Args:
         image: Original dermoscopy image
@@ -74,7 +74,7 @@ def search_similar_cases(
     # Use the context builder's search query for text matching
     query_text = clinical_context.search_query
 
-    # Search with both image and text
+    # Search with fused image + text query embedding
     results = store.search_similar(
         query_text=query_text,
         query_image=image,
