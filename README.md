@@ -109,7 +109,9 @@ General reasons for medical / dermoscopy data
 
 Training notebooks:
 - Task 3: https://www.kaggle.com/code/dinhnhatky/isic-018-task3-training
+- Task 3 weights: https://www.kaggle.com/models/dinhnhatky/isic-task3-weights/
 - Task 2: https://www.kaggle.com/code/dinhnhatky2003/isic-2018-task2-transunet-512-640
+- Task 2 weights: https://www.kaggle.com/models/dinhnhatky2003/isic-2018-task2-weight/
 
 
 ### 3) Handling Noisy or Incomplete Annotations
