@@ -154,23 +154,25 @@ Training notebooks:
 
 ```mermaid
 flowchart LR
-    A[Web UI - Gradio] --> B[app.py / analyze_image]
-    B --> C[Task 2 Segmenter<br/>TransUNet]
-    B --> D[Task 3 Classifier<br/>ISIC classifier]
-    C --> E[Clinical Context Builder]
+    A[Gradio UI<br/>app.py] --> B[Analysis Orchestrator<br/>analyze_image]
+    B --> C[Task 2 Module<br/>models/task2_segmenter]
+    B --> D[Task 3 Module<br/>models/task3_classifier]
+    B --> E[Context Builder<br/>pipeline/context_builder.py]
+    B --> F[RAG Search<br/>pipeline/image_search.py]
+    B --> G[LLM Explainer<br/>pipeline/llm_explainer.py]
+    B --> H[Report Generator<br/>pipeline/report_generator.py]
+
+    C --> E
     D --> E
-    A --> F[Input Image]
-    F --> G[RAG Retriever<br/>Hybrid CLIP image + search_query text]
-    E --> G
-    G --> H[(ChromaDB)]
-    I[(Reference Cases JSON)] --> H
-    E --> J[LLM Explainer]
-    G --> J
-    C --> K[Clinical Report Generator]
-    D --> K
-    G --> K
-    J --> K
-    K --> A
+    E --> F
+    F --> G
+    E --> H
+    F --> H
+    G --> H
+
+    I[(Reference Cases JSON)] --> J[Embedding Store<br/>rag/embedding_store.py]
+    J --> K[(ChromaDB)]
+    F --> J
 ```
 
 ### 2) End-to-End Clinical Flow (Image + Patient Info)
@@ -182,16 +184,18 @@ flowchart TD
     D[Input: Patient Metadata<br/>Age / Sex / Lesion Location] --> E[Clinical Context Builder]
     B --> E
     C --> E
-    A --> F[RAG Retrieval<br/>Hybrid CLIP image + search_query text]
-    E --> F
-    E --> G[Risk Flags + Rule Tags<br/>inside context builder]
+    A --> F[Hybrid RAG Query<br/>CLIP image embedding]
+    E --> F2[Hybrid RAG Query<br/>search_query text embedding]
+    F --> G[RAG Retrieval + Clinical Reranking]
+    F2 --> G
+    E --> G
     E --> H[LLM Clinical Explainer]
-    F --> H
+    G --> H
     B --> I[Structured Clinical Report]
     C --> I
-    F --> I
-    H --> I
+    E --> I
     G --> I
+    H --> I
     I --> J[Doctor-Facing Outputs]
 ```
 
