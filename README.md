@@ -150,46 +150,49 @@ Training notebooks:
 
 > This repository's current UI/flow is designed around clinician-facing decision support (not autonomous diagnosis).
 
-### 1) System Architecture (Target)
+### 1) Current System Architecture
 
 ```mermaid
 flowchart LR
-    A[Web UI - Gradio] --> B[Inference Orchestrator]
-    B --> C[Task2 Segmenter Service]
-    B --> D[Task3 Classifier Service]
-    B --> E[RAG Retriever]
-    B --> F[LLM Explainer]
-    E --> G[(Vector DB - Chroma)]
-    E --> H[(Reference Cases + Guidelines)]
-    B --> I[Clinical Report Generator]
-    I --> A
-
-    J[(Model Registry)] --> C
-    J --> D
-    K[(Observability + Audit Logs)] --> B
-    L[(Safety Rules / Escalation)] --> I
+    A[Web UI - Gradio] --> B[app.py / analyze_image]
+    B --> C[Task 2 Segmenter<br/>TransUNet]
+    B --> D[Task 3 Classifier<br/>ISIC classifier]
+    C --> E[Clinical Context Builder]
+    D --> E
+    A --> F[Input Image]
+    F --> G[RAG Retriever<br/>Hybrid CLIP image + search_query text]
+    E --> G
+    G --> H[(ChromaDB)]
+    I[(Reference Cases JSON)] --> H
+    E --> J[LLM Explainer]
+    G --> J
+    C --> K[Clinical Report Generator]
+    D --> K
+    G --> K
+    J --> K
+    K --> A
 ```
 
 ### 2) End-to-End Clinical Flow (Image + Patient Info)
 
 ```mermaid
 flowchart TD
-    A[Input: Dermoscopy Image] --> C[Preprocess + Validate Input]
-    B[Input: Patient Metadata<br/>Age / Sex / Lesion Location] --> D[Clinical Context Builder]
-    C --> E[Task 2 Segmentation]
-    C --> F[Task 3 Classification]
-    E --> D
-    F --> D
-    D --> G[RAG: Retrieve Similar Cases]
-    D --> H[Risk Flag Logic<br/>High-risk / Uncertain]
-    G --> I[LLM Clinical Explainer]
-    D --> I
+    A[Input: Dermoscopy Image] --> B[Task 2 Segmentation]
+    A --> C[Task 3 Classification]
+    D[Input: Patient Metadata<br/>Age / Sex / Lesion Location] --> E[Clinical Context Builder]
+    B --> E
+    C --> E
+    A --> F[RAG Retrieval<br/>Hybrid CLIP image + search_query text]
+    E --> F
+    E --> G[Risk Flags + Rule Tags<br/>inside context builder]
+    E --> H[LLM Clinical Explainer]
+    F --> H
+    B --> I[Structured Clinical Report]
+    C --> I
+    F --> I
     H --> I
-    I --> J[Structured Clinical Report]
-    E --> J
-    F --> J
-    G --> J
-    J --> K[Doctor-Facing Outputs]
+    G --> I
+    I --> J[Doctor-Facing Outputs]
 ```
 
 ### 3) Clinician-Facing Design
@@ -234,7 +237,7 @@ flowchart TD
 
 #### 3.5) Mockups / Diagrams in This README
 
-- `System Architecture (Target)` diagram
+- `Current System Architecture` diagram
 - `End-to-End Clinical Flow (Image + Patient Info)` diagram
 - `Knowledge Base Architecture (Clinical-Focused)` section for retrieval + evidence flow
 
